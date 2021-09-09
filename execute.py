@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import re
 import os
 import sys
@@ -31,7 +32,7 @@ class block:
 lines = []
 codeblocks = []
 
-with open('TestCases.md', 'r') as source:
+with open(sys.argv[1], 'r') as source:
 	current_block = None
 	for i, line in enumerate(source):
 
@@ -94,9 +95,10 @@ def init_interpereter():
 init_interpereter()
 
 for block in codeblocks:
+	#  print(block.startline, block.endline, block.lines)
+
 	if block.new:
 		init_interpereter()
-	print(block.startline, block.endline, block.lines)
 
 	# Get stdout
 	stdout = ""
@@ -114,13 +116,25 @@ for block in codeblocks:
 		else: stderr += line.decode('utf-8')
 
 	# Reformat file
-	stderr=re.sub(stderr_start,'',stderr)
 	lines[block.startline-1] = "```python\n"
-	if len(stdout)>0:lines[block.endline+1] += f"```\n{stdout}```\n"
-	if len(stderr)>0:lines[block.endline+1] += f"```\n{stderr}```\n"
+	if block.hide:
+		for i in range(block.startline-1, block.endline+2): lines[i]=""
 
+	if block.unboxed:
+		if len(stdout)>0: lines[block.endline+1] +=    f"\n{stdout}\n"
+	else:
+		if len(stdout)>0: lines[block.endline+1] += f"```\n{stdout}```\n"
+	# (strips the line-prompts from stderr)
+
+
+	stderr=re.sub(stderr_start,'',stderr)
+	if len(stderr)>0:lines[block.endline+1] += f"```\n{stderr}```\n"
+	# #hide implementation
 end_interpreter()
+
+
 # Output the results
+print(len(sys.argv))
 with open('Output.md', 'w') as dest:
 	for line in lines:
 		dest.write(line)
