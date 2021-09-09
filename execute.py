@@ -105,6 +105,9 @@ for block in codeblocks:
 	for line in block.lines:
 		proc.stdin.write(f"{line.strip()}\n".encode("utf-8"))
 		proc.stdin.flush()
+		# This line is by far the jankiest part of the current way of doing things. Instead of properly determining whether 
+		# the interpreter has output something or is just waiting for input, we just wait .1 seconds and if nothing new has
+		# printed we assume it's probably safe to enter the next line. I know, it sucks, I'll fix it later.
 		try:  line = queue_out.get(timeout=.1)
 		except Empty: pass
 		else: stdout += line.decode('utf-8')
@@ -134,9 +137,11 @@ end_interpreter()
 
 
 # Output the results
-print(len(sys.argv))
-with open('Output.md', 'w') as dest:
+if len(sys.argv) == 3:
+	with open(sys.argv[2], 'w') as dest:
+		for line in lines:
+			dest.write(line)
+else:
 	for line in lines:
-		dest.write(line)
-
+		print(line, end='')
 

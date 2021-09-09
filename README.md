@@ -22,28 +22,42 @@ This should be ignored
 > ```
 > '''python#run
 > ```
-```python#run
+```python
 x = 5
 y = 6
 print(x+y)
 ```
+```
+11
+```
 `#run` is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
 ##### Shared interpreter demo, also just done with `'''python#run`
-```python#run
+```python
 x += 100
 print(x-y)
 ```
+```
+99
+```
 
 ##### Spinning up a new interpreter instance (with `'''python#run#new`)
-```python#run#new
+```python
 print(x)
+```
+```
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'x' is not defined
 ```
 
 ##### Unboxed output with `#unboxed`
-```python#run#unboxed
+```python
 print('This is a test of *various* **markdown** ~~features~~.')
 ```
+
+This is a test of *various* **markdown** ~~features~~.
+
 
 ##### Hidden input-field, though with `#hide`
 The source code block here looks like the following:
@@ -53,11 +67,10 @@ The source code block here looks like the following:
 > '''
 > ```
 However that was removed from the file, leaving us just with
-```python#run#hide
-print(1+2)
+```
+3
 ```
 
-```python#run#hide#unboxed
-infix = ', of course,'
-print(f"These tags can{infix} be combined.")
-```
+
+These tags can, of course, be combined.
+
