@@ -12,8 +12,8 @@ execute either with `./execute.py [SOURCE] [OUTPUT]` or `./execute.py [SOURCE]` 
 
 # Test Cases
 
-##### A standard unflagged codeblock
-```python
+##### A standard, unflagged codeblock
+```
 This should be ignored
 ```
 
@@ -30,9 +30,11 @@ print(x+y)
 ```
 11
 ```
-`#run` is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
+The `#run` tag is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
-##### Shared interpreter demo, also just done with `'''python#run`
+##### Shared interpreter demo
+*Again, just done with `'''python#run`.*
+
 ```python
 x += 100
 print(x-y)
@@ -41,7 +43,8 @@ print(x-y)
 99
 ```
 
-##### Spinning up a new interpreter instance (with `'''python#run#new`)
+##### Spinning up a new interpreter instance
+This one uses one additional tag, now looking like `'''python#run#new`. Snazzy.
 ```python
 print(x)
 ```
@@ -66,11 +69,11 @@ The source code block here looks like the following:
 > print(1+2)
 > '''
 > ```
-However that was removed from the file, leaving us just with
+However that gets dropped from the file in the course of processing, leaving us with just
 ```
 3
 ```
 
 
-These tags can, of course, be combined.
+These tags can, of course, be combined. Just look at this very sentence in [README_src.md](./README_src.md) 😉
 
