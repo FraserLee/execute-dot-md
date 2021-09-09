@@ -27,7 +27,7 @@ print(x-y)
 ```
 
 ##### New interpretor demo (with `#run#new`)
-```python#run
+```python#run#new
 print(x)
 ```
 
