@@ -6,8 +6,9 @@ from threading import Thread
 from queue import Queue, Empty
 
 # Regex expressions for identifying the start and end of code-blocks
-block_start = re.compile("^```python#run([#\w=]*)*$");
-block_end = re.compile("^```$");
+block_start = re.compile("^```python#run([#\w=]*)*$")
+block_end = re.compile("^```$")
+stderr_start = re.compile("^(>>> )+")
 
 # Define a structure to keep track of codeblocks
 class block:
@@ -88,19 +89,26 @@ for block in codeblocks:
 		init_interpereter()
 	print(block.startline, block.endline, block.lines)
 
+	# Get stdout
+	stdout = ""
 	for line in block.lines:
 		proc.stdin.write(f"{line.strip()}\n".encode("utf-8"))
 		proc.stdin.flush()
 		try:  line = queue_out.get(timeout=.1)
 		except Empty: pass
-		else:
-			print(line.decode('utf-8'), end='')
-
+		else: stdout += line.decode('utf-8')
+	# Get stderr
+	stderr = ""
 	while True:
 		try:  line = queue_err.get_nowait()
 		except Empty: break
-		else:
-			print(line.decode('utf-8'), end='')
+		else: stderr += line.decode('utf-8')
+
+	# Reformat file
+	stderr=re.sub(stderr_start,'',stderr)
+	lines[block.startline-1] = "```python\n"
+	if len(stdout)>0:lines[block.endline+1] += f"```\n{stdout}```\n"
+	if len(stderr)>0:lines[block.endline+1] += f"```\n{stderr}```\n"
 
 end_interpreter()
 # Output the results
