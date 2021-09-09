@@ -19,10 +19,6 @@ y = 6
 print(x+y)
 ```
 `#run` is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
-//delete after
-```python#run
-print(kk)
-```
 
 ##### Shared interpretor demo, also just with `#run`
 ```python#run

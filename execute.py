@@ -8,6 +8,11 @@ from queue import Queue, Empty
 # Regex expressions for identifying the start and end of code-blocks
 block_start = re.compile("^```python#run([#\w=]*)*$")
 block_end = re.compile("^```$")
+
+block_unboxed = re.compile(".*#unboxed")
+block_new = re.compile(".*#new")
+block_hide = re.compile(".*#hide")
+
 stderr_start = re.compile("^(>>> )+")
 
 # Define a structure to keep track of codeblocks
@@ -33,7 +38,11 @@ with open('TestCases.md', 'r') as source:
 		lines.append(line)
 
 		if current_block is None and block_start.match(line):
-				current_block = block(i+1)
+			current_block = block(i+1)
+			#check for extra optional flags
+			current_block.unboxed = bool(block_unboxed.match(line))
+			current_block.new     = bool(block_new.match(line))
+			current_block.hide    = bool(block_hide.match(line))
 
 		elif current_block is not None:
 			if block_end.match(line):
