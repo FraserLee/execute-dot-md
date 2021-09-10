@@ -51,7 +51,7 @@ print(x)
 print('This is a test of *various* **markdown** ~~features~~.')
 ```
 
-##### Hidden input-field, though with `#hide`
+##### Hidden input-field with `#hide`
 The source code block here looks like the following:
 > ```
 > '''python#run#hide
