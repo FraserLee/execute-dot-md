@@ -1,7 +1,7 @@
 # execute.md
 run code-blocks in markdown files and insert the results immediately below, like a home-brewed jupyter notebook.
 
-execute either with `./execute.py [SOURCE] [OUTPUT]` or `./execute.py [SOURCE]` (in which case results will be output to the terminal).
+execute either with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (in which case results will be output to the terminal).
 
 - [x] basic functionality
 - [ ] matplotlib support
@@ -33,7 +33,10 @@ The `#run` tag is stripped from the final output, leaving us with just a codeblo
 *Again, just done with `'''python#run`.*
 
 ```python#run
-x += 100
+for i in range(4):
+  x += 100
+  y -= x
+
 print(x-y)
 ```
 

@@ -103,7 +103,7 @@ for block in codeblocks:
 	# Get stdout
 	stdout = ""
 	for line in block.lines:
-		proc.stdin.write(f"{line.strip()}\n".encode("utf-8"))
+		proc.stdin.write(line.encode("utf-8"))
 		proc.stdin.flush()
 		# This line is by far the jankiest part of the current way of doing things. Instead of properly determining whether 
 		# the interpreter has output something or is just waiting for input, we just wait .1 seconds and if nothing new has
