@@ -6,11 +6,8 @@ import subprocess
 from threading import Thread
 from queue import Queue, Empty
 
-def end_interpreter(proc):
-	proc.stdin.close()
-	proc.terminate()
-	proc.wait(timeout=0.2)
 
+# <SUBPROCESS MANAGEMENT>
 def init_interpereter():
 	def enqueue_output(out, queue):
 		for line in iter(out.readline, b''):
@@ -33,7 +30,15 @@ def init_interpereter():
 
 	return (proc, queue_out, queue_err)
 
-# Regex expressions for identifying the start and end of code-blocks
+def end_interpreter(proc):
+	proc.stdin.close()
+	proc.terminate()
+	proc.wait(timeout=0.2)
+# </SUBPROCESS MANAGEMENT>
+
+
+# <REGEX DEFINITIONS>
+# identifying the start and end of code-blocks
 block_start = re.compile("^```python#run([#\w=]*)*$")
 block_end = re.compile("^```$")
 
@@ -42,10 +47,14 @@ block_new = re.compile(".*#new")
 block_hide = re.compile(".*#hide")
 
 stderr_start = re.compile("^(>>> )+")
+# </REGEX DEFINITIONS>
 
-# Define a structure to keep track of codeblocks
+
+# <MAIN PROCESS>
 class block:
-	# include a language enum if extended later
+	"""Represents a code-block, tracking relevant features"""
+
+	# include a language enum here if extended later
 	startline: int
 	endline = None
 	unboxed = False
@@ -55,15 +64,16 @@ class block:
 		self.startline = startline
 		self.lines   = []
 
-def parse(source_lines):
-	""" Parse a markdown file
+def execute(source_lines):
+	""" Execute a markdown file
 
-	Input: Something that can be enumerated over to give strings represeneting lines
+	Input: Something that can be enumerated over to give strings representing lines
 	 - eg. A file object, a list of strings, etc.
 	Output: A list of strings, the resulting file.
 	"""
 
-	# Extraction of blocks and lines from a file
+	# <PARSING>
+    # Extraction of blocks and lines from a file
 	lines = []
 	codeblocks = []
 
@@ -86,7 +96,10 @@ def parse(source_lines):
 				codeblocks.append(current_block)
 				current_block = None
 			else: current_block.lines.append(line)
+	#</PARSING>
 
+
+	#<EXECUTION>
 	# Setup execution environment
 	(proc, queue_out, queue_err) = init_interpereter()
 
@@ -133,12 +146,16 @@ def parse(source_lines):
 		# #hide implementation
 	end_interpreter(proc)
 
+	#</EXECUTION>
+
 	return lines
+# </MAIN PROCESS>
 
 
+# <CLI INVOCATION>
 if __name__ == '__main__':
 	with open(sys.argv[1], 'r') as source:
-		result = parse(source)
+		result = execute(source)
 		# Output the results
 		if len(sys.argv) == 3:
 			with open(sys.argv[2], 'w') as dest:
@@ -147,3 +164,4 @@ if __name__ == '__main__':
 		else:
 			for line in result:
 				print(line, end='')
+# </CLI INVOCATION>
