@@ -55,7 +55,13 @@ class block:
 		self.startline = startline
 		self.lines   = []
 
-def parse(soruce):
+def parse(source_lines):
+	""" Parse a markdown file
+
+	Input: Something that can be enumerated over to give strings represeneting lines
+	 - eg. A file object, a list of strings, etc.
+	Output: A list of strings, the resulting file.
+	"""
 
 	# Extraction of blocks and lines from a file
 	lines = []
@@ -63,7 +69,7 @@ def parse(soruce):
 
 	global block
 	current_block = None
-	for i, line in enumerate(source):
+	for i, line in enumerate(source_lines):
 
 		lines.append(line)
 
