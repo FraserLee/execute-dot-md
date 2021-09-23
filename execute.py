@@ -6,6 +6,33 @@ import subprocess
 from threading import Thread
 from queue import Queue, Empty
 
+def end_interpreter(proc):
+	proc.stdin.close()
+	proc.terminate()
+	proc.wait(timeout=0.2)
+
+def init_interpereter():
+	def enqueue_output(out, queue):
+		for line in iter(out.readline, b''):
+			queue.put(line)
+		out.close()
+
+
+	proc = subprocess.Popen(['python3', '-i', '-q'],
+							stdin =subprocess.PIPE,
+							stdout=subprocess.PIPE,
+							stderr=subprocess.PIPE)
+
+	queue_out  = Queue()
+	thread_out = Thread(target=enqueue_output, args=(proc.stdout, queue_out), daemon=True)
+	thread_out.start()
+
+	queue_err  = Queue()
+	thread_err = Thread(target=enqueue_output, args=(proc.stderr, queue_err), daemon=True)
+	thread_err.start()
+
+	return (proc, queue_out, queue_err)
+
 # Regex expressions for identifying the start and end of code-blocks
 block_start = re.compile("^```python#run([#\w=]*)*$")
 block_end = re.compile("^```$")
@@ -28,11 +55,13 @@ class block:
 		self.startline = startline
 		self.lines   = []
 
-# Extraction of blocks and lines from a file
-lines = []
-codeblocks = []
+def parse(soruce):
 
-with open(sys.argv[1], 'r') as source:
+	# Extraction of blocks and lines from a file
+	lines = []
+	codeblocks = []
+
+	global block
 	current_block = None
 	for i, line in enumerate(source):
 
@@ -52,96 +81,63 @@ with open(sys.argv[1], 'r') as source:
 				current_block = None
 			else: current_block.lines.append(line)
 
-# Setup execution environment
-proc      = None
-queue_out = None
-queue_err = None
+	# Setup execution environment
+	(proc, queue_out, queue_err) = init_interpereter()
 
-def end_interpreter():
-	proc.stdin.close()
-	proc.terminate()
-	proc.wait(timeout=0.2)
+	# Execute each codeblock
+	for block in codeblocks:
+		#  print(block.startline, block.endline, block.lines)
 
-def init_interpereter():
-	global proc
-	global queue_out
-	global queue_err
+		if block.new:
+			end_interpreter(proc)
+			(proc, queue_out, queue_err) = init_interpereter()
 
-	if proc is not None:
-		end_interpreter()
+		# Get stdout
+		stdout = ""
+		for line in block.lines:
+			proc.stdin.write(line.encode("utf-8"))
+			proc.stdin.flush()
+			# This line is by far the jankiest part of the current way of doing things. Instead of properly determining whether 
+			# the interpreter has output something or is just waiting for input, we just wait .1 seconds and if nothing new has
+			# printed we assume it's probably safe to enter the next line. I know, it sucks, I'll fix it later.
+			try:  line = queue_out.get(timeout=.1)
+			except Empty: pass
+			else: stdout += line.decode('utf-8')
+		# Get stderr
+		stderr = ""
+		while True:
+			try:  line = queue_err.get_nowait()
+			except Empty: break
+			else: stderr += line.decode('utf-8')
 
-	def enqueue_output(out, queue):
-		for line in iter(out.readline, b''):
-			queue.put(line)
-		out.close()
+		# Reformat file
+		lines[block.startline-1] = "```python\n"
+		if block.hide:
+			for i in range(block.startline-1, block.endline+2): lines[i]=""
 
-
-	proc = subprocess.Popen(['python3', '-i', '-q'],
-							stdin =subprocess.PIPE,
-							stdout=subprocess.PIPE,
-							stderr=subprocess.PIPE)
-
-	queue_out  = Queue()
-	thread_out = Thread(target=enqueue_output, args=(proc.stdout, queue_out), daemon=True)
-	thread_out.start()
-
-	queue_err  = Queue()
-	thread_err = Thread(target=enqueue_output, args=(proc.stderr, queue_err), daemon=True)
-	thread_err.start()
-
-	return (proc, queue_out, queue_err)
-
-# Execute each codeblock
-init_interpereter()
-
-for block in codeblocks:
-	#  print(block.startline, block.endline, block.lines)
-
-	if block.new:
-		init_interpereter()
-
-	# Get stdout
-	stdout = ""
-	for line in block.lines:
-		proc.stdin.write(line.encode("utf-8"))
-		proc.stdin.flush()
-		# This line is by far the jankiest part of the current way of doing things. Instead of properly determining whether 
-		# the interpreter has output something or is just waiting for input, we just wait .1 seconds and if nothing new has
-		# printed we assume it's probably safe to enter the next line. I know, it sucks, I'll fix it later.
-		try:  line = queue_out.get(timeout=.1)
-		except Empty: pass
-		else: stdout += line.decode('utf-8')
-	# Get stderr
-	stderr = ""
-	while True:
-		try:  line = queue_err.get_nowait()
-		except Empty: break
-		else: stderr += line.decode('utf-8')
-
-	# Reformat file
-	lines[block.startline-1] = "```python\n"
-	if block.hide:
-		for i in range(block.startline-1, block.endline+2): lines[i]=""
-
-	if block.unboxed:
-		if len(stdout)>0: lines[block.endline+1] +=    f"\n{stdout}\n"
-	else:
-		if len(stdout)>0: lines[block.endline+1] += f"```\n{stdout}```\n"
-	# (strips the line-prompts from stderr)
+		if block.unboxed:
+			if len(stdout)>0: lines[block.endline+1] +=    f"\n{stdout}\n"
+		else:
+			if len(stdout)>0: lines[block.endline+1] += f"```\n{stdout}```\n"
+		# (strips the line-prompts from stderr)
 
 
-	stderr=re.sub(stderr_start,'',stderr)
-	if len(stderr)>0:lines[block.endline+1] += f"```\n{stderr}```\n"
-	# #hide implementation
-end_interpreter()
+		stderr=re.sub(stderr_start,'',stderr)
+		if len(stderr)>0:lines[block.endline+1] += f"```\n{stderr}```\n"
+		# #hide implementation
+	end_interpreter(proc)
+
+	return lines
 
 
-# Output the results
-if len(sys.argv) == 3:
-	with open(sys.argv[2], 'w') as dest:
-		for line in lines:
-			dest.write(line)
-else:
-	for line in lines:
-		print(line, end='')
-
+if __name__ == '__main__':
+	with open(sys.argv[1], 'r') as source:
+		result = parse(source)
+		# Output the results
+		if len(sys.argv) == 3:
+			with open(sys.argv[2], 'w') as dest:
+				for line in result:
+					dest.write(line)
+		else:
+			for line in result:
+				print(line, end='')
