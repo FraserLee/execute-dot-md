@@ -1,13 +1,20 @@
 # execute.md
 run code-blocks in markdown files and insert the results immediately below, like a home-brewed jupyter notebook.
 
-execute either with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (in which case results will be output to the terminal).
 
 - [x] basic functionality
 - [ ] matplotlib support
 - [ ] additional languages 
 
 
+#### Usage:
+**1.** Execute either with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (in which case results will be output to the terminal) 
+
+**2.** Use it in python
+> ```python
+> from execute import execute
+> open('dest.md', 'w').writelines(execute(open('src.md', 'r'))) 
+> ```
 ---
 
 # Test Cases
