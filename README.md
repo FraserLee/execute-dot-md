@@ -78,5 +78,5 @@ However that gets dropped from the file in the course of processing, leaving us 
 ```
 
 
-These tags can, of course, be combined. Just look at this very sentence in [README_src.md](./README_src.md) 😉
+These tags can, of course, be combined. Just look at this very sentence in [README_src.md](https://raw.githubusercontent.com/FraserLee/execute-dot-md/main/README_src.md) 😉
 

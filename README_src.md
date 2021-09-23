@@ -65,5 +65,5 @@ print(1+2)
 
 ```python#run#hide#unboxed
 infix = ', of course,'
-print(f"These tags can{infix} be combined. Just look at this very sentence in [README_src.md](./README_src.md) 😉")
+print(f"These tags can{infix} be combined. Just look at this very sentence in [README_src.md](https://raw.githubusercontent.com/FraserLee/execute-dot-md/main/README_src.md) 😉")
 ```
