@@ -8,7 +8,7 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 
 #### Usage:
-**1.** Execute either with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (in which case results will be output to the terminal) 
+**1.** Execute either with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (in which case results will be output to stdout)
 
 **2.** Use it in python
 > ```python
