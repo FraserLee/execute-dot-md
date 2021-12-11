@@ -30,12 +30,14 @@ This should be ignored
 > '''python#run
 > ```
 ```python
-x = 5
-y = 6
-print(x+y)
+def f(x):
+  if x <= 1: return 1
+  return x * f(x-1)
+
+print([f(x) for x in range(6)])
 ```
 ```
-11
+[1, 1, 2, 6, 24, 120]
 ```
 The `#run` tag is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
@@ -43,25 +45,21 @@ The `#run` tag is stripped from the final output, leaving us with just a codeblo
 *Again, just done with `'''python#run`.*
 
 ```python
-for i in range(4):
-  x += 100
-  y -= x
-
-print(x-y)
+print(f(10))
 ```
 ```
-1419
+3628800
 ```
 
 ##### Spinning up a new interpreter instance
 This one uses one additional tag, now looking like `'''python#run#new`. Snazzy.
 ```python
-print(x)
+print(f(11))
 ```
 ```
 Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'x' is not defined
+  File "<string>", line 1, in <module>
+NameError: name 'f' is not defined
 ```
 
 ##### Unboxed output with `#unboxed`
@@ -79,7 +77,7 @@ The source code block here looks like the following:
 > print(1+2)
 > '''
 > ```
-However that gets dropped from the file in the course of processing, leaving us with just
+However that gets dropped from the file, leaving us with just
 ```
 3
 ```

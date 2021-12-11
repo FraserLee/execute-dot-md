@@ -8,32 +8,13 @@ from queue import Queue, Empty
 
 
 # <SUBPROCESS MANAGEMENT>
-def init_interpereter():
-    def enqueue_output(out, queue):
-        for line in iter(out.readline, b''):
-            queue.put(line)
-        out.close()
+# siloing this code off so I can implement language-specific subprocess processes later
+def subp_run(code):
+    proc = subprocess.Popen(['python3', '-c', code],
+                            stdout  = subprocess.PIPE,
+                            stderr  = subprocess.PIPE)
 
-
-    proc = subprocess.Popen(['python3', '-i', '-q'],
-                            stdin  = subprocess.PIPE,
-                            stdout = subprocess.PIPE,
-                            stderr = subprocess.PIPE)
-
-    queue_out  = Queue()
-    thread_out = Thread(target=enqueue_output, args=(proc.stdout, queue_out), daemon=True)
-    thread_out.start()
-
-    queue_err  = Queue()
-    thread_err = Thread(target=enqueue_output, args=(proc.stderr, queue_err), daemon=True)
-    thread_err.start()
-
-    return (proc, queue_out, queue_err)
-
-def end_interpreter(proc):
-    proc.stdin.close()
-    proc.terminate()
-    proc.wait(timeout=0.2)
+    return proc.communicate(timeout = 1.)
 # </SUBPROCESS MANAGEMENT>
 
 
@@ -45,35 +26,61 @@ block_end     = re.compile("^```$")
 block_unboxed = re.compile(".*#unboxed")
 block_new     = re.compile(".*#new")
 block_hide    = re.compile(".*#hide")
-
-stderr_start  = re.compile("^(>>> )+")
 # </REGEX DEFINITIONS>
 
 
 # <MAIN PROCESS>
+
+# make these dicts based on a language-enum later
+prior_code = ''
+prior_output = ''
+
 class block:
     """Represents a code-block, tracking relevant features"""
+    def __init__(self, startline: int,
+                 unboxed = False,
+                 hide    = False,
+                 new     = False):
 
-    # include a language enum here if extended later
-    startline: int
-    endline = None
-    unboxed = False
-    hide    = False
-    new     = False
-    def __init__(self, startline):
         self.startline = startline
-        self.lines     = []
+        self.endline   = None
+
+        self.unboxed = unboxed
+        self.hide    = hide
+        self.new     = new
+
+        self.lines   = []
+
+    def run(self):
+        # runs in what'll seem like a shared interpreter by concatenating prior
+        # code, then removing output shared with prior runs.
+        global prior_code, prior_output
+        if self.new: prior_code = prior_output = ''
+
+        prior_code += ''.join(self.lines)
+        stdout, stderr = subp_run(prior_code)
+        stdout = stdout.decode('utf-8') + stderr.decode('utf-8')
+        for char in prior_output: # a bit of a hack, but it works (for deterministic output)
+            if stdout[0] == char:
+                stdout = stdout[1:]
+            else: break
+
+        prior_output += stdout
+
+        if len(stderr) > 0: prior_code = prior_output = ''
+
+        return stdout
 
 def execute(source_lines):
     """ Execute a markdown file
 
     Input: Something that can be enumerated over to give strings representing lines
-     - eg. A file object, a list of strings, etc.
+        (A file object, a list of strings, etc)
     Output: A list of strings, the resulting file.
     """
 
     # <PARSING>
-    # Extraction of blocks and lines from a file
+    # Extraction of codeblocks and lines from a file
     lines = []
     codeblocks = []
 
@@ -83,6 +90,7 @@ def execute(source_lines):
 
         lines.append(line)
 
+        # if we're not in a block, check if we're starting one
         if current_block is None and block_start.match(line):
             current_block = block(i+1)
             #check for extra optional flags
@@ -90,6 +98,7 @@ def execute(source_lines):
             current_block.new     = bool(block_new.match(line))
             current_block.hide    = bool(block_hide.match(line))
 
+        # if we're in one, check if we're ending
         elif current_block is not None:
             if block_end.match(line):
                 current_block.endline = i-1
@@ -100,52 +109,24 @@ def execute(source_lines):
 
 
     #<EXECUTION>
-    # Setup execution environment
-    (proc, queue_out, queue_err) = init_interpereter()
-
     # Execute each codeblock
     for block in codeblocks:
         #  print(block.startline, block.endline, block.lines)
 
-        if block.new:
-            end_interpreter(proc)
-            (proc, queue_out, queue_err) = init_interpereter()
-
-        # Get stdout
-        stdout = ""
-        for line in block.lines:
-            proc.stdin.write(line.encode("utf-8"))
-            proc.stdin.flush()
-            # This line is by far the jankiest part of the current way of doing things. Instead of properly determining whether 
-            # the interpreter has output something or is just waiting for input, we just wait .1 seconds and if nothing new has
-            # printed we assume it's probably safe to enter the next line. I know, it sucks, I'll fix it later.
-            try:  line = queue_out.get(timeout=.1)
-            except Empty: pass
-            else: stdout += line.decode('utf-8')
-        # Get stderr
-        stderr = ""
-        while True:
-            try:  line = queue_err.get_nowait()
-            except Empty: break
-            else: stderr += line.decode('utf-8')
+        # Run the block
+        stdout = block.run()
 
         # Reformat file
         lines[block.startline-1] = "```python\n"
         if block.hide:
             for i in range(block.startline-1, block.endline+2): lines[i] = ""
 
+        if len(stdout) > 0 and stdout[-1] != '\n': stdout += '\n'
+
         if block.unboxed:
             if len(stdout)>0: lines[block.endline+1] += f"\n{stdout}\n"
         else:
             if len(stdout)>0: lines[block.endline+1] += f"```\n{stdout}```\n"
-        # (strips the line-prompts from stderr)
-
-
-        stderr=re.sub(stderr_start,'',stderr)
-        if len(stderr)>0:lines[block.endline+1] += f"```\n{stderr}```\n"
-        # #hide implementation
-    end_interpreter(proc)
-
     #</EXECUTION>
 
     return lines

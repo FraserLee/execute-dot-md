@@ -30,9 +30,11 @@ This should be ignored
 > '''python#run
 > ```
 ```python#run
-x = 5
-y = 6
-print(x+y)
+def f(x):
+  if x <= 1: return 1
+  return x * f(x-1)
+
+print([f(x) for x in range(6)])
 ```
 The `#run` tag is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
@@ -40,17 +42,13 @@ The `#run` tag is stripped from the final output, leaving us with just a codeblo
 *Again, just done with `'''python#run`.*
 
 ```python#run
-for i in range(4):
-  x += 100
-  y -= x
-
-print(x-y)
+print(f(10))
 ```
 
 ##### Spinning up a new interpreter instance
 This one uses one additional tag, now looking like `'''python#run#new`. Snazzy.
 ```python#run#new
-print(x)
+print(f(11))
 ```
 
 ##### Unboxed output with `#unboxed`
@@ -65,7 +63,7 @@ The source code block here looks like the following:
 > print(1+2)
 > '''
 > ```
-However that gets dropped from the file in the course of processing, leaving us with just
+However that gets dropped from the file, leaving us with just
 ```python#run#hide
 print(1+2)
 ```
