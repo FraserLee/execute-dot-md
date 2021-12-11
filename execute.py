@@ -1,11 +1,8 @@
 #!/usr/bin/python3
 import re
-import os
 import sys
 import subprocess
-from threading import Thread
-from queue import Queue, Empty
-
+from dataclasses import dataclass, field
 
 # <SUBPROCESS MANAGEMENT>
 # siloing this code off so I can implement language-specific subprocess processes later
@@ -28,48 +25,18 @@ block_new     = re.compile(".*#new")
 block_hide    = re.compile(".*#hide")
 # </REGEX DEFINITIONS>
 
-
 # <MAIN PROCESS>
-
-# make these dicts based on a language-enum later
-prior_code = ''
-prior_output = ''
-
+@dataclass
 class block:
     """Represents a code-block, tracking relevant features"""
-    def __init__(self, startline: int,
-                 unboxed = False,
-                 hide    = False,
-                 new     = False):
+    startline: int
+    endline: int = None
 
-        self.startline = startline
-        self.endline   = None
+    unboxed = False
+    hide    = False
+    new     = False
 
-        self.unboxed = unboxed
-        self.hide    = hide
-        self.new     = new
-
-        self.lines   = []
-
-    def run(self):
-        # runs in what'll seem like a shared interpreter by concatenating prior
-        # code, then removing output shared with prior runs.
-        global prior_code, prior_output
-        if self.new: prior_code = prior_output = ''
-
-        prior_code += ''.join(self.lines)
-        stdout, stderr = subp_run(prior_code)
-        stdout = stdout.decode('utf-8') + stderr.decode('utf-8')
-        for char in prior_output: # a bit of a hack, but it works (for deterministic output)
-            if stdout[0] == char:
-                stdout = stdout[1:]
-            else: break
-
-        prior_output += stdout
-
-        if len(stderr) > 0: prior_code = prior_output = ''
-
-        return stdout
+    lines: list = field(default_factory = list)
 
 def execute(source_lines):
     """ Execute a markdown file
@@ -109,12 +76,29 @@ def execute(source_lines):
 
 
     #<EXECUTION>
+
+    # make these into dicts based on a language-enum later
+    prior_code = ''
+    prior_output = ''
+
     # Execute each codeblock
     for block in codeblocks:
         #  print(block.startline, block.endline, block.lines)
 
-        # Run the block
-        stdout = block.run()
+        # Runs the block in what'll seem like a shared interpreter by 
+        # concatenating prior code, then removing output shared with prior runs.
+        if block.new: prior_code = prior_output = ''
+
+        prior_code += ''.join(block.lines)
+        stdout, stderr = subp_run(prior_code)
+        stdout = stdout.decode('utf-8') + stderr.decode('utf-8')
+        for char in prior_output: # a bit of a hack, but it works (for deterministic output)
+            if stdout[0] == char:
+                stdout = stdout[1:]
+            else: break
+
+        prior_output += stdout
+        if len(stderr) > 0: prior_code = prior_output = ''
 
         # Reformat file
         lines[block.startline-1] = "```python\n"
