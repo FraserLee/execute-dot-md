@@ -22,6 +22,8 @@ def subp_run(code, lang):
         run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove('a.out')
         return run_p
+    elif lang == 'bash':
+        return subprocess.run(['bash', '-c', code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     return None
 # </SUBPROCESS MANAGEMENT>
@@ -29,7 +31,7 @@ def subp_run(code, lang):
 
 # <REGEX DEFINITIONS>
 # identifying the start and end of code-blocks
-block_start   = re.compile("^```(python|c|rust)#run( *#\w*( *= *[\w.]*)?)*$")
+block_start   = re.compile("^```(python|c|rust|bash)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")
