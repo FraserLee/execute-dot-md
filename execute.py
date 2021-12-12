@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 # <REGEX DEFINITIONS>
 # identifying the start and end of code-blocks
-block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+|go|js|javascript)#run( *#\w*( *= *[\w.]*)?)*$")
+block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+|go|js|javascript|lua)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")
@@ -119,14 +119,16 @@ def subp_run(code, lang):
     if lang == 'python' or \
        lang == 'bash' or \
        lang == 'js' or \
-       lang == 'javascript':
+       lang == 'javascript' or \
+       lang == 'lua':
         return subprocess.run({
             'python'     : ['python3', '-c', code],
             'bash'       : ['bash',    '-c', code],
             'js'         : ['node',    '-e', code],
             'javascript' : ['node',    '-e', code],
+            'lua'        : ['lua',     '-e', code],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        
+
     # compile
     elif lang == 'rust' or \
          lang == 'c' or \

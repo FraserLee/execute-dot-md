@@ -209,3 +209,12 @@ console.log(x + y)
 6
 71
 ```
+
+# Lua
+
+```lua
+io.write(2 + 2)
+```
+```
+4
+```

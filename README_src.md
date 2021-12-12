@@ -164,3 +164,9 @@ const y = 1
 console.log(x - y)
 console.log(x + y)
 ```
+
+# Lua
+
+```lua#run
+io.write(2 + 2)
+```
