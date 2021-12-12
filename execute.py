@@ -1,23 +1,29 @@
 #!/usr/bin/python3
 import re
 import sys
+import os
 import subprocess
 from dataclasses import dataclass, field
 
 # <SUBPROCESS MANAGEMENT>
 # siloing this code off so I can implement language-specific subprocess processes later
-def subp_run(code):
-    proc = subprocess.Popen(['python3', '-c', code],
-                            stdout  = subprocess.PIPE,
-                            stderr  = subprocess.PIPE)
-
-    return proc.communicate(timeout = 1.)
+def subp_run(code, lang):
+    if lang == 'python':
+        return subprocess.run(['python3', '-c', code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    elif lang == 'c':
+        comp_p = subprocess.run(['gcc', '-x', 'c', '-o', 'a.out', '-', '-lm'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if comp_p.returncode != 0:
+            return comp_p
+        run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove('a.out')
+        return run_p
+    return None
 # </SUBPROCESS MANAGEMENT>
 
 
 # <REGEX DEFINITIONS>
 # identifying the start and end of code-blocks
-block_start   = re.compile("^```python#run([#\w = ]*)*$")
+block_start   = re.compile("^```(python|c)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")
@@ -29,6 +35,8 @@ block_hide    = re.compile(".*#hide")
 @dataclass
 class block:
     """Represents a code-block, tracking relevant features"""
+    lang: str
+
     startline: int
     endline: int = None
 
@@ -58,8 +66,8 @@ def execute(source_lines):
         lines.append(line)
 
         # if we're not in a block, check if we're starting one
-        if current_block is None and block_start.match(line):
-            current_block = block(i+1)
+        if current_block is None and (match := block_start.match(line)):
+            current_block = block(lang = match.group(1), startline = i+1)
             #check for extra optional flags
             current_block.unboxed = bool(block_unboxed.match(line))
             current_block.new     = bool(block_new.match(line))
@@ -77,9 +85,9 @@ def execute(source_lines):
 
     #<EXECUTION>
 
-    # make these into dicts based on a language-enum later
-    prior_code = ''
-    prior_output = ''
+    # lang dicts
+    prior_code = {}
+    prior_output = {}
 
     # Execute each codeblock
     for block in codeblocks:
@@ -87,21 +95,25 @@ def execute(source_lines):
 
         # Runs the block in what'll seem like a shared interpreter by 
         # concatenating prior code, then removing output shared with prior runs.
-        if block.new: prior_code = prior_output = ''
+        lang = block.lang
+        if block.new or not lang in prior_code:
+            prior_code[lang] = prior_output[lang] = ''
 
-        prior_code += ''.join(block.lines)
-        stdout, stderr = subp_run(prior_code)
-        stdout = stdout.decode('utf-8') + stderr.decode('utf-8')
-        for char in prior_output: # a bit of a hack, but it works (for deterministic output)
+        prior_code[lang] += ''.join(block.lines)
+        proc = subp_run(prior_code[lang], lang)
+        stdout = proc.stdout.decode('utf-8') + proc.stderr.decode('utf-8')
+        for char in prior_output[lang]: # a bit of a hack, but it works (for deterministic output)
             if stdout[0] == char:
                 stdout = stdout[1:]
             else: break
 
-        prior_output += stdout
-        if len(stderr) > 0: prior_code = prior_output = ''
+        prior_output[lang] += stdout
+        if proc.returncode != 0:
+            del prior_code[lang]
+            del prior_output[lang]
 
         # Reformat file
-        lines[block.startline-1] = "```python\n"
+        lines[block.startline-1] = f'```{block.lang}\n'
         if block.hide:
             for i in range(block.startline-1, block.endline+2): lines[i] = ""
 

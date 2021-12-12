@@ -72,3 +72,27 @@ print(1+2)
 infix = ', of course,'
 print(f"These tags can{infix} be combined. Just look at this very sentence in [README_src.md](https://raw.githubusercontent.com/FraserLee/execute-dot-md/main/README_src.md) 😉")
 ```
+
+# Other Languages
+
+#### c
+
+```c#run
+#include <stdio.h>
+#include <math.h>
+int main() {
+    float x = 5.0;
+    float y = 0.4;
+    printf("%f\n", sqrt(x*y));
+    return 0;
+}
+```
+
+```c#run#new
+#include <stdio.h>
+int main() {
+    this is a syntax error
+}
+```
+
+

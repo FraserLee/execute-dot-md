@@ -85,3 +85,36 @@ However that gets dropped from the file, leaving us with just
 
 These tags can, of course, be combined. Just look at this very sentence in [README_src.md](https://raw.githubusercontent.com/FraserLee/execute-dot-md/main/README_src.md) 😉
 
+
+# Other Languages
+
+#### c
+
+```c
+#include <stdio.h>
+#include <math.h>
+int main() {
+    float x = 5.0;
+    float y = 0.4;
+    printf("%f\n", sqrt(x*y));
+    return 0;
+}
+```
+```
+1.414214
+```
+
+```c
+#include <stdio.h>
+int main() {
+    this is a syntax error
+}
+```
+```
+<stdin>:3:5: error: use of undeclared identifier 'this'
+    this is a syntax error
+    ^
+1 error generated.
+```
+
+
