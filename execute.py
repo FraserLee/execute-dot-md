@@ -5,36 +5,6 @@ import os
 import subprocess
 from dataclasses import dataclass, field
 
-# <SUBPROCESS MANAGEMENT>
-# siloing this code off so I can implement language-specific subprocess processes later
-def subp_run(code, lang):
-    if lang == 'python':
-        return subprocess.run(['python3', '-c', code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    elif lang == 'bash':
-        return subprocess.run(['bash', '-c', code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    elif lang == 'rust':
-        comp_p = subprocess.run(['rustc', '-o', 'a.out', '-'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if comp_p.returncode != 0: return comp_p
-        run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.remove('a.out')
-        return run_p
-    elif lang == 'c':
-        comp_p = subprocess.run(['gcc', '-x', 'c', '-o', 'a.out', '-', '-lm'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if comp_p.returncode != 0: return comp_p
-        run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.remove('a.out')
-        return run_p
-    elif lang == 'cpp' or lang == 'c++':
-        comp_p = subprocess.run(['g++', '-x', 'c++', '-o', 'a.out', '-', '-lm'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if comp_p.returncode != 0: return comp_p
-        run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.remove('a.out')
-        return run_p
-
-    return None
-# </SUBPROCESS MANAGEMENT>
-
-
 # <REGEX DEFINITIONS>
 # identifying the start and end of code-blocks
 block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+)#run( *#\w*( *= *[\w.]*)?)*$")
@@ -142,6 +112,29 @@ def execute(source_lines):
     return lines
 # </MAIN PROCESS>
 
+# <SUBPROCESS MANAGEMENT>
+# siloing everything language-specific in execution to this one section
+def subp_run(code, lang):
+    if lang == 'python' or lang == 'bash':
+        return subprocess.run({
+            'python': ['python3', '-c', code],
+            'bash'  : ['bash',    '-c', code]
+            }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    elif lang == 'rust' or lang == 'c' or lang == 'cpp' or lang == 'c++':
+        comp_p = subprocess.run({
+            'rust': ['rustc',            '-o', 'a.out', '-'],
+            'c'   : ['gcc', '-x', 'c',   '-o', 'a.out', '-', '-lm'],
+            'cpp' : ['g++', '-x', 'c++', '-o', 'a.out', '-', '-lm'],
+            'c++' : ['g++', '-x', 'c++', '-o', 'a.out', '-', '-lm'],
+            }[lang], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if comp_p.returncode != 0: 
+            return comp_p
+        run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove('a.out')
+        return run_p
+
+    return None
+# </SUBPROCESS MANAGEMENT>
 
 # <CLI INVOCATION>
 if __name__ == '__main__':
