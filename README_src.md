@@ -75,7 +75,7 @@ print(f"These tags can{infix} be combined. Just look at this very sentence in [R
 
 # Other Languages
 
-#### c
+## c
 
 ```c#run
 #include <stdio.h>
@@ -95,4 +95,12 @@ int main() {
 }
 ```
 
+## :crab: rust :crab:
 
+```rust#run
+fn main() {
+    let x = 2;
+    let y = 3;
+    println!("{}", x + y);
+}
+```

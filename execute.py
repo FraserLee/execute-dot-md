@@ -12,18 +12,24 @@ def subp_run(code, lang):
         return subprocess.run(['python3', '-c', code], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif lang == 'c':
         comp_p = subprocess.run(['gcc', '-x', 'c', '-o', 'a.out', '-', '-lm'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if comp_p.returncode != 0:
-            return comp_p
+        if comp_p.returncode != 0: return comp_p
         run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove('a.out')
         return run_p
+    elif lang == 'rust':
+        comp_p = subprocess.run(['rustc', '-o', 'a.out', '-'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if comp_p.returncode != 0: return comp_p
+        run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove('a.out')
+        return run_p
+
     return None
 # </SUBPROCESS MANAGEMENT>
 
 
 # <REGEX DEFINITIONS>
 # identifying the start and end of code-blocks
-block_start   = re.compile("^```(python|c)#run( *#\w*( *= *[\w.]*)?)*$")
+block_start   = re.compile("^```(python|c|rust)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")

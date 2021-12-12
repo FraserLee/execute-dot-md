@@ -88,7 +88,7 @@ These tags can, of course, be combined. Just look at this very sentence in [READ
 
 # Other Languages
 
-#### c
+## c
 
 ```c
 #include <stdio.h>
@@ -117,4 +117,15 @@ int main() {
 1 error generated.
 ```
 
+## :crab: rust :crab:
 
+```rust
+fn main() {
+    let x = 2;
+    let y = 3;
+    println!("{}", x + y);
+}
+```
+```
+5
+```
