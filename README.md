@@ -21,7 +21,7 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 ##### A standard, unflagged codeblock
 ```
-This should be ignored
+This'll be ignored
 ```
 
 ##### A codeblock designed to be run
@@ -42,7 +42,7 @@ print([f(x) for x in range(6)])
 The `#run` tag is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
 ##### Shared interpreter demo
-*Again, just done with `'''python#run`.*
+*Again, just done with* `'''python#run`.
 
 ```python
 print(f(10))
@@ -51,7 +51,7 @@ print(f(10))
 3628800
 ```
 
-##### Spinning up a new interpreter instance
+##### A new interpreter instance
 This one uses one additional tag, now looking like `'''python#run#new`. Snazzy.
 ```python
 print(f(11))
@@ -88,16 +88,7 @@ These tags can, of course, be combined. Just look at this very sentence in [READ
 
 # Languages
 
-## python :snake:
-
-```python
-print(2+2)
-```
-```
-4
-```
-
-## :crab: rust :crab:
+# :crab: rust :crab:
 
 ```rust
 fn main() {
@@ -110,7 +101,32 @@ fn main() {
 5
 ```
 
-## c
+```rust
+fn main() {
+    this is a syntax error
+}
+```
+```
+error: expected one of `!`, `.`, `::`, `;`, `?`, `{`, `}`, or an operator, found `is`
+ --> <anon>:2:10
+  |
+2 |     this is a syntax error
+  |          ^^ expected one of 8 possible tokens
+
+error: aborting due to previous error
+
+```
+
+# python :snake:
+
+```python
+print(2+2)
+```
+```
+4
+```
+
+# c
 
 ```c
 #include <stdio.h>
@@ -126,19 +142,7 @@ int main() {
 1.414214
 ```
 
-```c
-int main() {
-    this is a syntax error
-}
-```
-```
-<stdin>:3:5: error: use of undeclared identifier 'this'
-    this is a syntax error
-    ^
-1 error generated.
-```
-
-#### c++
+## c++
 
 ```cpp
 #include <iostream>
@@ -154,7 +158,7 @@ int main() {
 nan
 ```
 
-## bash :shell:
+# bash :shell:
 
 ```bash
 # print the first few prime numbers separated by dashes

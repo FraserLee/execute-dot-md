@@ -21,7 +21,7 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 ##### A standard, unflagged codeblock
 ```
-This should be ignored
+This'll be ignored
 ```
 
 ##### A codeblock designed to be run
@@ -39,13 +39,13 @@ print([f(x) for x in range(6)])
 The `#run` tag is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
 ##### Shared interpreter demo
-*Again, just done with `'''python#run`.*
+*Again, just done with* `'''python#run`.
 
 ```python#run
 print(f(10))
 ```
 
-##### Spinning up a new interpreter instance
+##### A new interpreter instance
 This one uses one additional tag, now looking like `'''python#run#new`. Snazzy.
 ```python#run#new
 print(f(11))
@@ -75,13 +75,7 @@ print(f"These tags can{infix} be combined. Just look at this very sentence in [R
 
 # Languages
 
-## python :snake:
-
-```python#run
-print(2+2)
-```
-
-## :crab: rust :crab:
+# :crab: rust :crab:
 
 ```rust#run
 fn main() {
@@ -91,7 +85,19 @@ fn main() {
 }
 ```
 
-## c
+```rust#run#new
+fn main() {
+    this is a syntax error
+}
+```
+
+# python :snake:
+
+```python#run
+print(2+2)
+```
+
+# c
 
 ```c#run
 #include <stdio.h>
@@ -104,13 +110,7 @@ int main() {
 }
 ```
 
-```c#run#new
-int main() {
-    this is a syntax error
-}
-```
-
-### c++
+## c++
 
 ```cpp#run
 #include <iostream>
@@ -123,7 +123,7 @@ int main() {
 }
 ```
 
-## bash :shell:
+# bash :shell:
 
 ```bash#run
 # print the first few prime numbers separated by dashes
