@@ -73,7 +73,23 @@ infix = ', of course,'
 print(f"These tags can{infix} be combined. Just look at this very sentence in [README_src.md](https://raw.githubusercontent.com/FraserLee/execute-dot-md/main/README_src.md) 😉")
 ```
 
-# Other Languages
+# Languages
+
+## python :snake:
+
+```python#run
+print(2+2)
+```
+
+## :crab: rust :crab:
+
+```rust#run
+fn main() {
+    let x = 2;
+    let y = 3;
+    println!("{}", x + y);
+}
+```
 
 ## c
 
@@ -89,25 +105,26 @@ int main() {
 ```
 
 ```c#run#new
-#include <stdio.h>
 int main() {
     this is a syntax error
 }
 ```
 
-## :crab: rust :crab:
+### c++
 
-```rust#run
-fn main() {
-    let x = 2;
-    let y = 3;
-    println!("{}", x + y);
+```cpp#run
+#include <iostream>
+#include <cmath>
+int main() {
+    float x = 1.;
+    float y = 2.;
+    std::cout << sqrt(-1) << std::endl;
+    return 0;
 }
 ```
 
 ## bash :shell:
 
-Some example code for bash:
 ```bash#run
 # print the first few prime numbers separated by dashes
 for ((i=2; i<37; i++)); do
@@ -125,3 +142,7 @@ awk 'BEGIN { RS = " "; ORS = "|" } {
     }
 } END { ORS = "\n"; print "" }' <<< $(seq 37 100)
 ```
+
+
+
+

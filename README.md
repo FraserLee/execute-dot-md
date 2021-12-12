@@ -86,7 +86,29 @@ However that gets dropped from the file, leaving us with just
 These tags can, of course, be combined. Just look at this very sentence in [README_src.md](https://raw.githubusercontent.com/FraserLee/execute-dot-md/main/README_src.md) 😉
 
 
-# Other Languages
+# Languages
+
+## python :snake:
+
+```python
+print(2+2)
+```
+```
+4
+```
+
+## :crab: rust :crab:
+
+```rust
+fn main() {
+    let x = 2;
+    let y = 3;
+    println!("{}", x + y);
+}
+```
+```
+5
+```
 
 ## c
 
@@ -105,7 +127,6 @@ int main() {
 ```
 
 ```c
-#include <stdio.h>
 int main() {
     this is a syntax error
 }
@@ -117,22 +138,24 @@ int main() {
 1 error generated.
 ```
 
-## :crab: rust :crab:
+#### c++
 
-```rust
-fn main() {
-    let x = 2;
-    let y = 3;
-    println!("{}", x + y);
+```cpp
+#include <iostream>
+#include <cmath>
+int main() {
+    float x = 1.;
+    float y = 2.;
+    std::cout << sqrt(-1) << std::endl;
+    return 0;
 }
 ```
 ```
-5
+nan
 ```
 
 ## bash :shell:
 
-Some example code for bash:
 ```bash
 # print the first few prime numbers separated by dashes
 for ((i=2; i<37; i++)); do
@@ -153,3 +176,7 @@ awk 'BEGIN { RS = " "; ORS = "|" } {
 ```
 2-3-5-7-11-13-17-19-23-29-31-37|41|43|47|53|59|61|67|71|73|79|83|89|97|
 ```
+
+
+
+
