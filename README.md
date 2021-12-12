@@ -191,5 +191,18 @@ func main() {
 }
 ```
 ```
-package command-line-arguments: no Go files in /Users/fraser/Documents/execute.md
+golang
+```
+
+# JS :yellow_square:
+
+```js
+const x = '7'
+const y = 1
+console.log(x - y)
+console.log(x + y)
+```
+```
+6
+71
 ```

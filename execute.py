@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 # <REGEX DEFINITIONS>
 # identifying the start and end of code-blocks
-block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+|go)#run( *#\w*( *= *[\w.]*)?)*$")
+block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+|go|js|javascript)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")
@@ -118,9 +118,13 @@ def subp_run(code, lang):
     if lang == 'python' or lang == 'bash':
         # interpreters are easy
         return subprocess.run({
-            'python': ['python3', '-c', code],
-            'bash'  : ['bash',    '-c', code],
+            'python'      : ['python3', '-c', code],
+            'bash'        : ['bash',    '-c', code],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    elif lang == lang == 'js' or lang == 'javascript':
+        return subprocess.run(['node', '-'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
     elif lang == 'rust' or lang == 'c' or lang == 'cpp' or lang == 'c++':
         # compile
         comp_p = subprocess.run({
@@ -136,13 +140,14 @@ def subp_run(code, lang):
         run_p = subprocess.run(['./.temp.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove('.temp.out')
         return run_p
+
     elif lang == 'go':
         # write code to file
-        with open('.temp.go', 'w') as f:
+        with open('temp.go', 'w') as f:
             f.write(code)
         # run
-        run_p = subprocess.run(['go', 'run', '.temp.go'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.remove('.temp.go')
+        run_p = subprocess.run(['go', 'run', 'temp.go'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove('temp.go')
         return run_p
     else:
         raise Exception(f'Language {lang} not supported')
