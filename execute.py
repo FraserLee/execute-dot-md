@@ -115,23 +115,28 @@ def execute(source_lines):
 # <SUBPROCESS MANAGEMENT>
 # siloing everything language-specific in execution to this one section
 def subp_run(code, lang):
-    if lang == 'python' or lang == 'bash':
-        # interpreters are easy
+    # interpreters are easy
+    if lang == 'python' or \
+       lang == 'bash' or \
+       lang == 'js' or \
+       lang == 'javascript':
         return subprocess.run({
-            'python'      : ['python3', '-c', code],
-            'bash'        : ['bash',    '-c', code],
+            'python'     : ['python3', '-c', code],
+            'bash'       : ['bash',    '-c', code],
+            'js'         : ['node',    '-e', code],
+            'javascript' : ['node',    '-e', code],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    elif lang == lang == 'js' or lang == 'javascript':
-        return subprocess.run(['node', '-'], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    elif lang == 'rust' or lang == 'c' or lang == 'cpp' or lang == 'c++':
-        # compile
+        
+    # compile
+    elif lang == 'rust' or \
+         lang == 'c' or \
+         lang == 'cpp' or \
+         lang == 'c++':
         comp_p = subprocess.run({
-            'rust': ['rustc',            '-o', '.temp.out', '-'],
-            'c'   : ['gcc', '-x', 'c',   '-o', '.temp.out', '-', '-lm'],
-            'cpp' : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
-            'c++' : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
+            'rust' : ['rustc',            '-o', '.temp.out', '-'],
+            'c'    : ['gcc', '-x', 'c',   '-o', '.temp.out', '-', '-lm'],
+            'cpp'  : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
+            'c++'  : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
             }[lang], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # if compilation's failed, return that so we can print the error
         if comp_p.returncode != 0:

@@ -3,14 +3,17 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 
 - [x] basic functionality
+- [x] additional languages
 - [ ] matplotlib support
-- [ ] additional languages 
 
 
 #### Usage:
-**1.** Execute either with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (in which case results will be output to stdout)
 
-**2.** Use it in python
+Either
+
+**1.** execute with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (which will print results to stdout), or
+
+**2.** use it through python (or whatever you want to FFI that to)
 > ```python
 > from execute import execute
 > open('dest.md', 'w').writelines(execute(open('src.md', 'r'))) 
@@ -91,7 +94,7 @@ fn main() {
 }
 ```
 
-# python :snake:
+# :snake: python :snake:
 
 ```python#run
 print(2+2)
