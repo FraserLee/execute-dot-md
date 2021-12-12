@@ -81,17 +81,11 @@ print(f"These tags can{infix} be combined. Just look at this very sentence in [R
 # :crab: rust :crab:
 
 ```rust#run
-fn main() {
-    let x = 2;
-    let y = 3;
-    println!("{}", x + y);
-}
+!req(languages/rust_example1.rs)
 ```
 
 ```rust#run#new
-fn main() {
-    this is a syntax error
-}
+!req(languages/rust_example2.rs)
 ```
 
 # :snake: python :snake:
@@ -103,70 +97,34 @@ print(2+2)
 # c
 
 ```c#run
-#include <stdio.h>
-#include <math.h>
-int main() {
-    float x = 5.0;
-    float y = 0.4;
-    printf("%f\n", sqrt(x*y));
-    return 0;
-}
+!req(languages/c_example.c)
 ```
 
 ## c++
 
 ```cpp#run
-#include <iostream>
-#include <cmath>
-int main() {
-    float x = 1.;
-    float y = 2.;
-    std::cout << sqrt(-1) << std::endl;
-    return 0;
-}
+!req(languages/cpp_example.cpp)
 ```
 
 # bash :shell:
 
 ```bash#run
-# print the first few prime numbers separated by dashes
-for ((i=2; i<37; i++)); do
-    for ((j=2; j<i; j++)); do
-        if (($i % $j == 0)); then break; fi
-    done
-    if (($i == $j)); then echo -n $i"-"; fi
-done
-
-# then finish off a few more with awk
-awk 'BEGIN { RS = " "; ORS = "|" } {
-    for (i=2; i<$1; i++) {
-        if ($1 % i == 0) break
-        if ($1 == i+1) print $1
-    }
-} END { ORS = "\n"; print "" }' <<< $(seq 37 100)
+!req(languages/bash_example.sh)
 ```
 
 # go
 ```go#run
-package main
-import "fmt"
-
-func main() {
-    fmt.Println("go" + "lang")
-}
+!req(languages/go_example.go)
 ```
 
 # JS :yellow_square:
 
 ```js#run
-const x = '7'
-const y = 1
-console.log(x - y)
-console.log(x + y)
+!req(languages/js_example.js)
 ```
 
 # Lua
 
 ```lua#run
-io.write(2 + 2)
+!req(languages/lua_example.lua)
 ```
