@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 # <REGEX DEFINITIONS>
 # identifying the start and end of code-blocks
-block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+)#run( *#\w*( *= *[\w.]*)?)*$")
+block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+|go)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")
@@ -116,24 +116,36 @@ def execute(source_lines):
 # siloing everything language-specific in execution to this one section
 def subp_run(code, lang):
     if lang == 'python' or lang == 'bash':
+        # interpreters are easy
         return subprocess.run({
             'python': ['python3', '-c', code],
-            'bash'  : ['bash',    '-c', code]
+            'bash'  : ['bash',    '-c', code],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif lang == 'rust' or lang == 'c' or lang == 'cpp' or lang == 'c++':
+        # compile
         comp_p = subprocess.run({
-            'rust': ['rustc',            '-o', 'a.out', '-'],
-            'c'   : ['gcc', '-x', 'c',   '-o', 'a.out', '-', '-lm'],
-            'cpp' : ['g++', '-x', 'c++', '-o', 'a.out', '-', '-lm'],
-            'c++' : ['g++', '-x', 'c++', '-o', 'a.out', '-', '-lm'],
+            'rust': ['rustc',            '-o', '.temp.out', '-'],
+            'c'   : ['gcc', '-x', 'c',   '-o', '.temp.out', '-', '-lm'],
+            'cpp' : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
+            'c++' : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
             }[lang], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if comp_p.returncode != 0: 
+        # if compilation's failed, return that so we can print the error
+        if comp_p.returncode != 0:
             return comp_p
-        run_p = subprocess.run(['./a.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.remove('a.out')
+        # run
+        run_p = subprocess.run(['./.temp.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove('.temp.out')
         return run_p
-
-    return None
+    elif lang == 'go':
+        # write code to file
+        with open('.temp.go', 'w') as f:
+            f.write(code)
+        # run
+        run_p = subprocess.run(['go', 'run', '.temp.go'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove('.temp.go')
+        return run_p
+    else:
+        raise Exception(f'Language {lang} not supported')
 # </SUBPROCESS MANAGEMENT>
 
 # <CLI INVOCATION>

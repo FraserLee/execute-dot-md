@@ -143,6 +143,12 @@ awk 'BEGIN { RS = " "; ORS = "|" } {
 } END { ORS = "\n"; print "" }' <<< $(seq 37 100)
 ```
 
+# go
+```go#run
+package main
+import "fmt"
 
-
-
+func main() {
+    fmt.Println("go" + "lang")
+}
+```
