@@ -135,6 +135,24 @@ print(2+2)
 main = (putStrLn . reverse) "!dlrow olleh"
 ```
 
+### Nim
+```nim#run
+proc factorial(x: int): int =
+    if x <= 0: 1
+    else: x * factorial(x - 1)
+  
+echo "10! = ", factorial(10)
+```
+
+### Haxe
+```haxe#run
+class Main {
+    static public function main() {
+        trace("hello world");
+    }
+}
+```
+
 ### Java :coffee:
 ```java#run
 class Main{

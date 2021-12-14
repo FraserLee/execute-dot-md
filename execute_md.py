@@ -9,7 +9,8 @@ from dataclasses import dataclass, field
 # identifying the start, end, and properties of code-blocks
 block_start   = re.compile("^```(" \
         "python|lua|js|javascript|bash|zsh|brainfuck" \
-        "|c|rust|cpp|c\+\+|go|java|kotlin|kts|haskell|hs" \
+        "|c|rust|cpp|c\+\+|go|java|kotlin|kts" \
+        "|haskell|hs|nim|haxe|hx" \
     ")#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
@@ -121,13 +122,16 @@ def execute_md(source_lines):
 # <SUBPROCESS MANAGEMENT>
 # siloing everything language-specific in execution to this one section
 def subp_run(code, lang):
+
     lang = { # re-map languages with multiple names
         'javascript' : 'js',
         'c++'        : 'cpp',
         'kts'        : 'kotlin',
         'hs'         : 'haskell',
+        'hx'         : 'haxe',
     }.get(lang, lang)
-    # interpreted languages
+
+    # interpreted(ish) languages
     if lang == 'python'  or \
        lang == 'js'      or \
        lang == 'lua'     or \
@@ -135,6 +139,8 @@ def subp_run(code, lang):
                             \
        lang == 'bash'    or \
        lang == 'zsh'     or \
+                            \
+       lang == 'nim'     or \
                             \
        lang == 'brainfuck':
         return subprocess.run({
@@ -146,18 +152,19 @@ def subp_run(code, lang):
             'bash'      : ['bash',      '-c', code],
             'zsh'       : ['zsh',       '-c', code],
 
+            'nim'       : ['nim',  '--eval:', code],
+
             'brainfuck' : ['brainfuck', '-e', code],
-            }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # compiled languages
     elif lang == 'rust' or \
-         lang == 'c'    or\
+         lang == 'c'    or \
          lang == 'cpp':
         comp_p = subprocess.run({
             'rust' : ['rustc',            '-o', '.temp.out', '-'],
             'c'    : ['gcc', '-x', 'c',   '-o', '.temp.out', '-', '-lm'],
             'cpp'  : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
-            'c++'  : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
             }[lang], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # if compilation's failed, return that so we can print the error
         if comp_p.returncode != 0: return comp_p
@@ -169,17 +176,20 @@ def subp_run(code, lang):
     # languages that need code written to a file
     elif lang == 'go'      or \
          lang == 'haskell' or \
-         lang == 'java':
+         lang == 'java'    or \
+         lang == 'haxe':
         with open(src_file:={
             'go'      : 'temp.go',
             'haskell' : 'temp.hs',
             'java'    : 'temp.java',
+            'haxe'    : 'Main.hx',
             }[lang], 'w') as f: f.write(code)
 
         run_p = subprocess.run({
-            'go'   : ['go', 'run',  src_file],
-            'haskell' : ['runhaskell', src_file],
-            'java' : ['java',       src_file],
+            'go'      : ['go', 'run',     src_file],
+            'haskell' : ['runhaskell',    src_file],
+            'java'    : ['java',          src_file],
+            'haxe'    : ['haxe', '--run', src_file],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove(src_file)
         return run_p

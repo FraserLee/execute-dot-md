@@ -249,6 +249,33 @@ main = (putStrLn . reverse) "!dlrow olleh"
 hello world!
 ```
 
+### Nim
+```nim
+proc factorial(x: int): int =
+    if x <= 0: 1
+    else: x * factorial(x - 1)
+  
+echo "10! = ", factorial(10)
+```
+```
+10! = 3628800
+Hint: used config file '/usr/local/Cellar/nim/1.6.0/nim/config/nim.cfg' [Conf]
+Hint: used config file '/usr/local/Cellar/nim/1.6.0/nim/config/config.nims' [Conf]
+Hint: used config file 'cmdfile' [Conf]
+```
+
+### Haxe
+```haxe
+class Main {
+    static public function main() {
+        trace("hello world");
+    }
+}
+```
+```
+Main.hx:3: hello world
+```
+
 ### Java :coffee:
 ```java
 class Main{
