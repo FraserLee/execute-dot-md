@@ -6,7 +6,7 @@ import subprocess
 from dataclasses import dataclass, field
 
 # <REGEX DEFINITIONS>
-# identifying the start and end of code-blocks
+# identifying the start, end, and properties of code-blocks
 block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+|go|js|javascript|lua)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
@@ -28,9 +28,11 @@ class block:
     hide    = False
     new     = False
 
+    # this syntax makes the list of lines instance specific
+    # (other fields are python's equivalent of primitives)
     lines: list = field(default_factory = list)
 
-def execute(source_lines):
+def execute_md(source_lines):
     """ Execute a markdown file
 
     Input: Something that can be enumerated over to give strings representing lines
@@ -39,7 +41,7 @@ def execute(source_lines):
     """
 
     # <PARSING>
-    # Extraction of codeblocks and lines from a file
+    # extract codeblocks and lines from a file
     lines = []
     codeblocks = []
 
@@ -63,46 +65,46 @@ def execute(source_lines):
                 current_block.endline = i-1
                 codeblocks.append(current_block)
                 current_block = None
+        # otherwise just add the line the current block
             else: current_block.lines.append(line)
     #</PARSING>
 
 
     #<EXECUTION>
 
-    # lang dicts
+    # key: language of codeblock
     prior_code = {}
     prior_output = {}
 
-    # Execute each codeblock
     for block in codeblocks:
-        #  print(block.startline, block.endline, block.lines)
-
-        # Runs the block in what'll seem like a shared interpreter by 
+        # runs blocks in what'll seem like a shared interpreter by 
         # concatenating prior code, then removing output shared with prior runs.
-        lang = block.lang
-        if block.new or not lang in prior_code:
-            prior_code[lang] = prior_output[lang] = ''
+        #
+        # it's a bit of a hack, but it works fine for deterministic code.
+        if block.new or not block.lang in prior_code:
+            prior_code[block.lang]   = ''
+            prior_output[block.lang] = ''
+        prior_code[block.lang] += ''.join(block.lines)
 
-        prior_code[lang] += ''.join(block.lines)
-        proc = subp_run(prior_code[lang], lang)
+        proc = subp_run(prior_code[block.lang], block.lang)
         stdout = proc.stdout.decode('utf-8') + proc.stderr.decode('utf-8')
-        for char in prior_output[lang]: # a bit of a hack, but it works (for deterministic output)
+
+        # remove shared output with prior runs (unoptimized, potential future bottleneck)
+        for char in prior_output[block.lang]:
             if stdout[0] == char:
                 stdout = stdout[1:]
             else: break
 
-        prior_output[lang] += stdout
+        prior_output[block.lang] += stdout
         if proc.returncode != 0:
-            del prior_code[lang]
-            del prior_output[lang]
+            del prior_code[block.lang]
+            del prior_output[block.lang]
 
-        # Reformat file
+        # Reformat file to insert results
         lines[block.startline-1] = f'```{block.lang}\n'
+        if len(stdout) > 0 and stdout[-1] != '\n': stdout += '\n'
         if block.hide:
             for i in range(block.startline-1, block.endline+2): lines[i] = ""
-
-        if len(stdout) > 0 and stdout[-1] != '\n': stdout += '\n'
-
         if block.unboxed:
             if len(stdout)>0: lines[block.endline+1] += f"\n{stdout}\n"
         else:
@@ -110,12 +112,13 @@ def execute(source_lines):
     #</EXECUTION>
 
     return lines
+
 # </MAIN PROCESS>
 
 # <SUBPROCESS MANAGEMENT>
 # siloing everything language-specific in execution to this one section
 def subp_run(code, lang):
-    # interpreters are easy
+    # interpreted languages
     if lang == 'python' or \
        lang == 'bash' or \
        lang == 'js' or \
@@ -129,7 +132,7 @@ def subp_run(code, lang):
             'lua'        : ['lua',     '-e', code],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    # compile
+    # compiled languages
     elif lang == 'rust' or \
          lang == 'c' or \
          lang == 'cpp' or \
@@ -141,35 +144,34 @@ def subp_run(code, lang):
             'c++'  : ['g++', '-x', 'c++', '-o', '.temp.out', '-', '-lm'],
             }[lang], input=code.encode('utf-8'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # if compilation's failed, return that so we can print the error
-        if comp_p.returncode != 0:
-            return comp_p
-        # run
+        if comp_p.returncode != 0: return comp_p
+        # run the compiled code
         run_p = subprocess.run(['./.temp.out'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove('.temp.out')
         return run_p
 
+    # languages that need code written to a file
     elif lang == 'go':
-        # write code to file
-        with open('temp.go', 'w') as f:
-            f.write(code)
-        # run
+        with open('temp.go', 'w') as f: f.write(code)
         run_p = subprocess.run(['go', 'run', 'temp.go'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove('temp.go')
         return run_p
-    else:
-        raise Exception(f'Language {lang} not supported')
+
+    # this shouldn't happen unless the regex covers cases that've been missed here.
+    else: raise Exception(f'Language {lang} not implemented')
 # </SUBPROCESS MANAGEMENT>
 
 # <CLI INVOCATION>
 if __name__ == '__main__':
     with open(sys.argv[1], 'r') as source:
-        result = execute(source)
-        # Output the results
-        if len(sys.argv) == 3:
+
+        result = execute_md(source)
+
+        if len(sys.argv) == 3: # output to file
             with open(sys.argv[2], 'w') as dest:
                 for line in result:
                     dest.write(line)
-        else:
+        else:                  # output to stdout
             for line in result:
                 print(line, end='')
 # </CLI INVOCATION>

@@ -11,12 +11,12 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 Either
 
-**1.** execute with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (which will print results to stdout), or
+**1.** execute with `./execute_md.py [SOURCE] [DEST]` or `./execute_md.py [SOURCE]` (which will print results to stdout), or
 
 **2.** use it through python (or whatever you want to FFI that to)
 > ```python
-> from execute import execute
-> open('dest.md', 'w').writelines(execute(open('src.md', 'r'))) 
+> from execute_md import execute_md
+> open('dest.md', 'w').writelines(execute_md(open('src.md', 'r'))) 
 > ```
 ---
 
@@ -79,7 +79,6 @@ print(f"These tags can{infix} be combined. Just look at this very sentence in [R
 # Languages
 
 # :crab: rust :crab:
-
 ```rust#run
 !req(languages/rust_example1.rs)
 ```
@@ -89,25 +88,21 @@ print(f"These tags can{infix} be combined. Just look at this very sentence in [R
 ```
 
 # :snake: python :snake:
-
 ```python#run
 print(2+2)
 ```
 
 # c
-
 ```c#run
 !req(languages/c_example.c)
 ```
 
 ## c++
-
 ```cpp#run
 !req(languages/cpp_example.cpp)
 ```
 
 # bash :shell:
-
 ```bash#run
 !req(languages/bash_example.sh)
 ```
@@ -118,13 +113,11 @@ print(2+2)
 ```
 
 # JS :yellow_square:
-
 ```js#run
 !req(languages/js_example.js)
 ```
 
 # Lua
-
 ```lua#run
 !req(languages/lua_example.lua)
 ```

@@ -11,12 +11,12 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 Either
 
-**1.** execute with `./execute.py [SOURCE] [DEST]` or `./execute.py [SOURCE]` (which will print results to stdout), or
+**1.** execute with `./execute_md.py [SOURCE] [DEST]` or `./execute_md.py [SOURCE]` (which will print results to stdout), or
 
 **2.** use it through python (or whatever you want to FFI that to)
 > ```python
-> from execute import execute
-> open('dest.md', 'w').writelines(execute(open('src.md', 'r'))) 
+> from execute_md import execute_md
+> open('dest.md', 'w').writelines(execute_md(open('src.md', 'r'))) 
 > ```
 ---
 
@@ -92,7 +92,6 @@ These tags can, of course, be combined. Just look at this very sentence in [READ
 # Languages
 
 # :crab: rust :crab:
-
 ```rust
 fn main() {
     let x = 2;
@@ -121,7 +120,6 @@ error: aborting due to previous error
 ```
 
 # :snake: python :snake:
-
 ```python
 print(2+2)
 ```
@@ -130,7 +128,6 @@ print(2+2)
 ```
 
 # c
-
 ```c
 #include <stdio.h>
 #include <math.h>
@@ -146,7 +143,6 @@ int main() {
 ```
 
 ## c++
-
 ```cpp
 #include <iostream>
 #include <cmath>
@@ -162,7 +158,6 @@ nan
 ```
 
 # bash :shell:
-
 ```bash
 # print the first few prime numbers separated by dashes
 for ((i=2; i<37; i++)); do
@@ -198,7 +193,6 @@ golang
 ```
 
 # JS :yellow_square:
-
 ```js
 const x = '7'
 const y = 1
@@ -211,7 +205,6 @@ console.log(x + y)
 ```
 
 # Lua
-
 ```lua
 io.write(2 + 2)
 ```
