@@ -144,15 +144,15 @@ def subp_run(code, lang):
                             \
        lang == 'brainfuck':
         return subprocess.run({
-            'python'    : ['python3',   '-c', code],
-            'js'        : ['node',      '-e', code],
-            'lua'       : ['lua',       '-e', code],
-            'kotlin'    : ['kotlin',    '-e', code],
+            'python'    : ['python3', '-c', code],
+            'js'        : ['node',    '-e', code],
+            'lua'       : ['lua',     '-e', code],
+            'kotlin'    : ['kotlin',  '-e', code],
 
-            'bash'      : ['bash',      '-c', code],
-            'zsh'       : ['zsh',       '-c', code],
+            'bash'      : ['bash',    '-c', code],
+            'zsh'       : ['zsh',     '-c', code],
 
-            'nim'       : ['nim',  '--eval:', code],
+            'nim'       : ['nim', '--hints:off', '--eval:', code],
 
             'brainfuck' : ['brainfuck', '-e', code],
         }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

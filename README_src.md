@@ -135,7 +135,7 @@ print(2+2)
 main = (putStrLn . reverse) "!dlrow olleh"
 ```
 
-### Nim
+### Nim :crown:
 ```nim#run
 proc factorial(x: int): int =
     if x <= 0: 1
