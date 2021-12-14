@@ -130,6 +130,11 @@ print(2+2)
 
 ---
 
+### Haskell
+```haskell#run
+main = (putStrLn . reverse) "!dlrow olleh"
+```
+
 ### Java :coffee:
 ```java#run
 class Main{
