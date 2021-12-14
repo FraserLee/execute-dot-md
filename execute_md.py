@@ -7,7 +7,10 @@ from dataclasses import dataclass, field
 
 # <REGEX DEFINITIONS>
 # identifying the start, end, and properties of code-blocks
-block_start   = re.compile("^```(python|brainfuck|c|rust|bash|cpp|c\+\+|go|js|javascript|lua)#run( *#\w*( *= *[\w.]*)?)*$")
+block_start   = re.compile("^```(" \
+        "python|lua|js|javascript|bash|zsh|brainfuck" \
+        "|c|rust|cpp|c\+\+|go" \
+    ")#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")
@@ -119,25 +122,31 @@ def execute_md(source_lines):
 # siloing everything language-specific in execution to this one section
 def subp_run(code, lang):
     # interpreted languages
-    if lang == 'python' or \
-       lang == 'bash' or \
+    if lang == 'python' or     \
        lang == 'javascript' or \
-       lang == 'js' or \
-       lang == 'brainfuck' or \
-       lang == 'lua':
+       lang == 'js' or         \
+       lang == 'lua' or        \
+                               \
+       lang == 'bash' or       \
+       lang == 'zsh' or        \
+                               \
+       lang == 'brainfuck':
         return subprocess.run({
-            'python'     : ['python3',    '-c',  code],
-            'bash'       : ['bash',       '-c',  code],
-            'javascript' : ['node',       '-e',  code],
-            'js'         : ['node',       '-e',  code],
-            'lua'        : ['lua',        '-e',  code],
-            'brainfuck'  : ['brainfuck',  '-e',  code],
+            'python'     : ['python3',   '-c', code],
+            'javascript' : ['node',      '-e', code],
+            'js'         : ['node',      '-e', code],
+            'lua'        : ['lua',       '-e', code],
+
+            'bash'       : ['bash',      '-c', code],
+            'zsh'        : ['zsh',       '-c', code],
+
+            'brainfuck'  : ['brainfuck', '-e', code],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # compiled languages
     elif lang == 'rust' or \
-         lang == 'c' or \
-         lang == 'cpp' or \
+         lang == 'c' or    \
+         lang == 'cpp' or  \
          lang == 'c++':
         comp_p = subprocess.run({
             'rust' : ['rustc',            '-o', '.temp.out', '-'],

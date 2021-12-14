@@ -124,6 +124,11 @@ print(2+2)
 
 ---
 
+### Zsh
+```zsh#run
+echo "hello world!"
+```
+
 ### Brainfuck
 *(example sourced from Wikipedia)*
 ```brainfuck#run

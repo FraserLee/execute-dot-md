@@ -206,13 +206,26 @@ console.log(x + y)
 
 # Lua
 ```lua
-io.write(2 + 2)
+local a = {1, nil, "test"}
+
+for key, value in pairs(a) do
+  local b = value and print(value)
+end
 ```
 ```
-4
+1
+test
 ```
 
 ---
+
+### Zsh
+```zsh
+echo "hello world!"
+```
+```
+hello world!
+```
 
 ### Brainfuck
 *(example sourced from Wikipedia)*
