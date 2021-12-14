@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 # <REGEX DEFINITIONS>
 # identifying the start, end, and properties of code-blocks
-block_start   = re.compile("^```(python|c|rust|bash|cpp|c\+\+|go|js|javascript|lua)#run( *#\w*( *= *[\w.]*)?)*$")
+block_start   = re.compile("^```(python|brainfuck|c|rust|bash|cpp|c\+\+|go|js|javascript|lua)#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed = re.compile(".*#unboxed")
@@ -121,15 +121,17 @@ def subp_run(code, lang):
     # interpreted languages
     if lang == 'python' or \
        lang == 'bash' or \
-       lang == 'js' or \
        lang == 'javascript' or \
+       lang == 'js' or \
+       lang == 'brainfuck' or \
        lang == 'lua':
         return subprocess.run({
-            'python'     : ['python3', '-c', code],
-            'bash'       : ['bash',    '-c', code],
-            'js'         : ['node',    '-e', code],
-            'javascript' : ['node',    '-e', code],
-            'lua'        : ['lua',     '-e', code],
+            'python'     : ['python3',    '-c',  code],
+            'bash'       : ['bash',       '-c',  code],
+            'javascript' : ['node',       '-e',  code],
+            'js'         : ['node',       '-e',  code],
+            'lua'        : ['lua',        '-e',  code],
+            'brainfuck'  : ['brainfuck',  '-e',  code],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # compiled languages

@@ -121,3 +121,12 @@ print(2+2)
 ```lua#run
 !req(languages/lua_example.lua)
 ```
+
+---
+
+### Brainfuck
+*(example sourced from Wikipedia)*
+```brainfuck#run
+++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>
+---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.
+```
