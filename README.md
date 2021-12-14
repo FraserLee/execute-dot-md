@@ -142,7 +142,7 @@ int main() {
 1.414214
 ```
 
-## c++
+# c++
 ```cpp
 #include <iostream>
 #include <cmath>
@@ -217,7 +217,40 @@ end
 test
 ```
 
+
+# Kotlin
+```kotlin
+import kotlin.math.*
+
+infix fun Int.greaterThanExp(x: Int) = this > exp(x.toFloat())
+fun factorial(x: Int): Int = when (x) {
+    0    -> 1
+    else -> x * factorial(x - 1)
+}
+
+println(factorial(5) greaterThanExp 6)
+println(factorial(6) greaterThanExp 7)
+println(factorial(7) greaterThanExp 8)
+```
+```
+false
+false
+true
+```
+
 ---
+
+### Java :coffee:
+```java
+class Main{
+    public static void main(String[] args){
+        System.out.println("hello world!");
+    }
+}
+```
+```
+hello world!
+```
 
 ### Zsh
 ```zsh

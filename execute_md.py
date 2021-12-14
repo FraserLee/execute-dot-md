@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 # identifying the start, end, and properties of code-blocks
 block_start   = re.compile("^```(" \
         "python|lua|js|javascript|bash|zsh|brainfuck" \
-        "|c|rust|cpp|c\+\+|go" \
+        "|c|rust|cpp|c\+\+|go|java|kotlin" \
     ")#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
@@ -122,13 +122,14 @@ def execute_md(source_lines):
 # siloing everything language-specific in execution to this one section
 def subp_run(code, lang):
     # interpreted languages
-    if lang == 'python' or     \
+    if lang == 'python'     or \
        lang == 'javascript' or \
-       lang == 'js' or         \
-       lang == 'lua' or        \
+       lang == 'js'         or \
+       lang == 'lua'        or \
+       lang == 'kotlin'     or \
                                \
-       lang == 'bash' or       \
-       lang == 'zsh' or        \
+       lang == 'bash'       or \
+       lang == 'zsh'        or \
                                \
        lang == 'brainfuck':
         return subprocess.run({
@@ -136,6 +137,7 @@ def subp_run(code, lang):
             'javascript' : ['node',      '-e', code],
             'js'         : ['node',      '-e', code],
             'lua'        : ['lua',       '-e', code],
+            'kotlin'     : ['kotlin',    '-e', code],
 
             'bash'       : ['bash',      '-c', code],
             'zsh'        : ['zsh',       '-c', code],
@@ -162,10 +164,18 @@ def subp_run(code, lang):
         return run_p
 
     # languages that need code written to a file
-    elif lang == 'go':
-        with open('temp.go', 'w') as f: f.write(code)
-        run_p = subprocess.run(['go', 'run', 'temp.go'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.remove('temp.go')
+    elif lang == 'go' or \
+         lang == 'java':
+        with open(src_file:={
+            'go'   : 'temp.go',
+            'java' : 'temp.java',
+            }[lang], 'w') as f: f.write(code)
+
+        run_p = subprocess.run({
+            'go'   : ['go', 'run', src_file],
+            'java' : ['java',      src_file],
+            }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        os.remove(src_file)
         return run_p
 
     # this shouldn't happen unless the regex covers cases that've been missed here.

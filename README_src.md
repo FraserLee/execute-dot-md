@@ -97,7 +97,7 @@ print(2+2)
 !req(languages/c_example.c)
 ```
 
-## c++
+# c++
 ```cpp#run
 !req(languages/cpp_example.cpp)
 ```
@@ -122,7 +122,22 @@ print(2+2)
 !req(languages/lua_example.lua)
 ```
 
+
+# Kotlin
+```kotlin#run
+!req(languages/kotlin_example.kts)
+```
+
 ---
+
+### Java :coffee:
+```java#run
+class Main{
+    public static void main(String[] args){
+        System.out.println("hello world!");
+    }
+}
+```
 
 ### Zsh
 ```zsh#run
