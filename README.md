@@ -22,12 +22,12 @@ Either
 
 # Test Cases
 
-##### A standard, unflagged codeblock
+#### A standard, unflagged codeblock
 ```
 This'll be ignored
 ```
 
-##### A codeblock designed to be run
+#### A codeblock designed to be run
 > The following block starts with
 > ```
 > '''python#run
@@ -44,7 +44,7 @@ print([f(x) for x in range(6)])
 ```
 The `#run` tag is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
-##### Shared interpreter demo
+#### Shared interpreter demo
 *Again, just done with* `'''python#run`.
 
 ```python
@@ -54,7 +54,7 @@ print(f(10))
 3628800
 ```
 
-##### A new interpreter instance
+#### A new interpreter instance
 This one uses one additional tag, now looking like `'''python#run#new`. Snazzy.
 ```python
 print(f(11))
@@ -65,7 +65,8 @@ Traceback (most recent call last):
 NameError: name 'f' is not defined
 ```
 
-##### Unboxed output with `#unboxed`
+#### Unboxed output
+`'''python#run#unboxed`
 ```python
 print('This is a test of *various* **markdown** ~~features~~.')
 ```
@@ -73,7 +74,7 @@ print('This is a test of *various* **markdown** ~~features~~.')
 This is a test of *various* **markdown** ~~features~~.
 
 
-##### Hidden input-field with `#hide`
+#### Hidden input-field with `#hide`
 The source code block here looks like the following:
 > ```
 > '''python#run#hide
@@ -91,7 +92,7 @@ These tags can, of course, be combined. Just look at this very sentence in [READ
 
 # Languages
 
-# :crab: rust :crab:
+## :crab: rust :crab:
 ```rust
 fn main() {
     let x = 2;
@@ -119,7 +120,7 @@ error: aborting due to previous error
 
 ```
 
-# :snake: python :snake:
+## :snake: python :snake:
 ```python
 print(2+2)
 ```
@@ -127,7 +128,7 @@ print(2+2)
 4
 ```
 
-# c
+## c
 ```c
 #include <stdio.h>
 #include <math.h>
@@ -142,7 +143,7 @@ int main() {
 1.414214
 ```
 
-# c++
+## c++
 ```cpp
 #include <iostream>
 #include <cmath>
@@ -157,7 +158,7 @@ int main() {
 nan
 ```
 
-# bash :shell:
+## bash :shell:
 ```bash
 # print the first few prime numbers separated by dashes
 for ((i=2; i<37; i++)); do
@@ -179,7 +180,7 @@ awk 'BEGIN { RS = " "; ORS = "|" } {
 2-3-5-7-11-13-17-19-23-29-31-37|41|43|47|53|59|61|67|71|73|79|83|89|97|
 ```
 
-# go
+## go
 ```go
 package main
 import "fmt"
@@ -192,7 +193,7 @@ func main() {
 golang
 ```
 
-# JS :yellow_square:
+## JS :yellow_square:
 ```js
 const x = '7'
 const y = 1
@@ -204,7 +205,7 @@ console.log(x + y)
 71
 ```
 
-# Lua
+## Lua
 ```lua
 local a = {1, nil, "test"}
 
@@ -218,7 +219,7 @@ test
 ```
 
 
-# Kotlin
+## Kotlin
 ```kotlin
 import kotlin.math.*
 

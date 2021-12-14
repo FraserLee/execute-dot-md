@@ -22,12 +22,12 @@ Either
 
 # Test Cases
 
-##### A standard, unflagged codeblock
+#### A standard, unflagged codeblock
 ```
 This'll be ignored
 ```
 
-##### A codeblock designed to be run
+#### A codeblock designed to be run
 > The following block starts with
 > ```
 > '''python#run
@@ -41,25 +41,26 @@ print([f(x) for x in range(6)])
 ```
 The `#run` tag is stripped from the final output, leaving us with just a codeblock starting with `'''python`, followed by a second codeblock with output.
 
-##### Shared interpreter demo
+#### Shared interpreter demo
 *Again, just done with* `'''python#run`.
 
 ```python#run
 print(f(10))
 ```
 
-##### A new interpreter instance
+#### A new interpreter instance
 This one uses one additional tag, now looking like `'''python#run#new`. Snazzy.
 ```python#run#new
 print(f(11))
 ```
 
-##### Unboxed output with `#unboxed`
+#### Unboxed output
+`'''python#run#unboxed`
 ```python#run#unboxed
 print('This is a test of *various* **markdown** ~~features~~.')
 ```
 
-##### Hidden input-field with `#hide`
+#### Hidden input-field with `#hide`
 The source code block here looks like the following:
 > ```
 > '''python#run#hide
@@ -78,7 +79,7 @@ print(f"These tags can{infix} be combined. Just look at this very sentence in [R
 
 # Languages
 
-# :crab: rust :crab:
+## :crab: rust :crab:
 ```rust#run
 !req(languages/rust_example1.rs)
 ```
@@ -87,43 +88,43 @@ print(f"These tags can{infix} be combined. Just look at this very sentence in [R
 !req(languages/rust_example2.rs)
 ```
 
-# :snake: python :snake:
+## :snake: python :snake:
 ```python#run
 print(2+2)
 ```
 
-# c
+## c
 ```c#run
 !req(languages/c_example.c)
 ```
 
-# c++
+## c++
 ```cpp#run
 !req(languages/cpp_example.cpp)
 ```
 
-# bash :shell:
+## bash :shell:
 ```bash#run
 !req(languages/bash_example.sh)
 ```
 
-# go
+## go
 ```go#run
 !req(languages/go_example.go)
 ```
 
-# JS :yellow_square:
+## JS :yellow_square:
 ```js#run
 !req(languages/js_example.js)
 ```
 
-# Lua
+## Lua
 ```lua#run
 !req(languages/lua_example.lua)
 ```
 
 
-# Kotlin
+## Kotlin
 ```kotlin#run
 !req(languages/kotlin_example.kts)
 ```
