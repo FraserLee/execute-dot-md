@@ -183,7 +183,7 @@ def subp_run(code, lang):
             'haskell' : 'temp.hs',
             'java'    : 'temp.java',
             'haxe'    : 'Main.hx',
-            }[lang], 'w') as f: f.write(code)
+        }[lang], mode='w') as f: f.write(code)
 
         run_p = subprocess.run({
             'go'      : ['go', 'run',     src_file],
