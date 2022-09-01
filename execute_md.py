@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 block_start   = re.compile("^```(" \
         "python|lua|js|javascript|bash|zsh|brainfuck" \
         "|c|rust|cpp|c\+\+|go|java|kotlin|kts" \
-        "|haskell|hs|nim|haxe|hx" \
+        "|haskell|hs|nim|ocaml|haxe|hx" \
     ")#run( *#\w*( *= *[\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
@@ -177,11 +177,13 @@ def subp_run(code, lang):
     elif lang == 'go'      or \
          lang == 'haskell' or \
          lang == 'java'    or \
+         lang == 'ocaml'   or \
          lang == 'haxe':
         with open(src_file:={
             'go'      : 'temp.go',
             'haskell' : 'temp.hs',
             'java'    : 'temp.java',
+            'ocaml'   : 'temp.ml',
             'haxe'    : 'Main.hx',
         }[lang], mode='w') as f: f.write(code)
 
@@ -189,6 +191,7 @@ def subp_run(code, lang):
             'go'      : ['go', 'run',     src_file],
             'haskell' : ['runhaskell',    src_file],
             'java'    : ['java',          src_file],
+            'ocaml'   : ['ocaml',         src_file],
             'haxe'    : ['haxe', '--run', src_file],
             }[lang], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         os.remove(src_file)

@@ -154,6 +154,11 @@ class Main {
 }
 ```
 
+### OCaml 🐫
+```ocaml#run
+print_string "hello world\n"
+```
+
 ### Java :coffee:
 ```java#run
 class Main{

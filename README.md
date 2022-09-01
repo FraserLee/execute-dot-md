@@ -274,6 +274,14 @@ class Main {
 Main.hx:3: hello world
 ```
 
+### OCaml 🐫
+```ocaml
+print_string "hello world\n"
+```
+```
+hello world
+```
+
 ### Java :coffee:
 ```java
 class Main{
