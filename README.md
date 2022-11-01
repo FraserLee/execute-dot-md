@@ -4,7 +4,7 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 - [x] basic functionality
 - [x] additional languages
-- [ ] matplotlib support
+- [ ] matplotlib support (TODO)
 
 
 #### Usage:
@@ -70,9 +70,7 @@ NameError: name 'f' is not defined
 ```python
 print('This is a test of *various* **markdown** ~~features~~.')
 ```
-
 This is a test of *various* **markdown** ~~features~~.
-
 
 #### Hidden input-field with `#hide`
 The source code block here looks like the following:
@@ -86,9 +84,16 @@ However that gets dropped from the file, leaving us with just
 3
 ```
 
+#### Inverted output order
+This one uses `'''python#run#output_first`:
+```
+7
+```
+```python
+print(3+4)
+```
 
 These tags can, of course, be combined. Just look at this very sentence in [README_src.md](https://raw.githubusercontent.com/FraserLee/execute-dot-md/main/README_src.md) 😉
-
 
 # Languages
 

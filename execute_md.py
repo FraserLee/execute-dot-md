@@ -7,16 +7,17 @@ from dataclasses import dataclass, field
 
 # <REGEX DEFINITIONS>
 # identifying the start, end, and properties of code-blocks
-block_start   = re.compile("^```(" \
+block_start  = re.compile(r"^```(" \
         "python|lua|js|javascript|bash|zsh|brainfuck" \
-        "|c|rust|cpp|c\+\+|go|java|kotlin|kts" \
+        "|c|rust|cpp|c\\+\\+|go|java|kotlin|kts" \
         "|haskell|hs|nim|ocaml|haxe|hx" \
-    ")#run( *#\w*( *= *[\w.]*)?)*$")
+    ")#run( *#\\w*( *= *[\\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
-block_unboxed = re.compile(".*#unboxed")
-block_new     = re.compile(".*#new")
-block_hide    = re.compile(".*#hide")
+block_unboxed      = re.compile(".*#unboxed")
+block_new          = re.compile(".*#new")
+block_hide         = re.compile(".*#hide")
+block_output_first = re.compile(".*#output_first")
 # </REGEX DEFINITIONS>
 
 # <MAIN PROCESS>
@@ -26,11 +27,12 @@ class block:
     lang: str
 
     startline: int
-    endline: int = None
+    endline: int
 
-    unboxed = False
-    hide    = False
-    new     = False
+    unboxed      = False
+    hide         = False
+    new          = False
+    output_first = False
 
     # this syntax makes the list of lines instance specific
     # (other fields are python's equivalent of primitives)
@@ -57,11 +59,16 @@ def execute_md(source_lines):
 
         # if we're not in a block, check if we're starting one
         if current_block is None and (match := block_start.match(line)):
-            current_block = block(lang = match.group(1), startline = i+1)
+            current_block = block(
+                lang = match.group(1),
+                startline = i+1,
+                endline = i+1,
+            )
             #check for extra optional flags
-            current_block.unboxed = bool(block_unboxed.match(line))
-            current_block.new     = bool(block_new.match(line))
-            current_block.hide    = bool(block_hide.match(line))
+            current_block.unboxed      = bool(block_unboxed.match(line))
+            current_block.new          = bool(block_new.match(line))
+            current_block.hide         = bool(block_hide.match(line))
+            current_block.output_first = bool(block_output_first.match(line))
 
         # if we're in one, check if we're ending
         elif current_block is not None:
@@ -104,15 +111,24 @@ def execute_md(source_lines):
             del prior_code[block.lang]
             del prior_output[block.lang]
 
-        # Reformat file to insert results
-        lines[block.startline-1] = f'```{block.lang}\n'
-        if len(stdout) > 0 and stdout[-1] != '\n': stdout += '\n'
-        if block.hide:
-            for i in range(block.startline-1, block.endline+2): lines[i] = ""
-        if block.unboxed:
-            if len(stdout)>0: lines[block.endline+1] += f"\n{stdout}\n"
+        # First, wipe the lines of the original codeblock
+        for i in range(block.startline-1, block.endline+2):
+            lines[i] = ''
+
+        # then, insert the results
+        if len(stdout) > 0:
+            if stdout[-1] != '\n': stdout += '\n'
+            if not block.unboxed:
+                stdout = f'```\n{stdout}```\n'
+
+        src_block = '' if block.hide else \
+                f'```{block.lang}\n' + ''.join(block.lines) + '```\n'
+
+        if block.output_first:
+            lines[block.endline+1] = stdout + src_block
         else:
-            if len(stdout)>0: lines[block.endline+1] += f"```\n{stdout}```\n"
+            lines[block.endline+1] = src_block + stdout
+
     #</EXECUTION>
 
     return lines

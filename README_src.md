@@ -4,7 +4,7 @@ run code-blocks in markdown files and insert the results immediately below, like
 
 - [x] basic functionality
 - [x] additional languages
-- [ ] matplotlib support
+- [ ] matplotlib support (TODO)
 
 
 #### Usage:
@@ -70,6 +70,12 @@ The source code block here looks like the following:
 However that gets dropped from the file, leaving us with just
 ```python#run#hide
 print(1+2)
+```
+
+#### Inverted output order
+This one uses `'''python#run#output_first`:
+```python#run#output_first
+print(3+4)
 ```
 
 ```python#run#hide#unboxed
