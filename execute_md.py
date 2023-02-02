@@ -11,7 +11,7 @@ block_start  = re.compile(r"^```(" \
         "python|lua|js|javascript|bash|zsh|brainfuck" \
         "|c|rust|cpp|c\\+\\+|go|java|kotlin|kts" \
         "|haskell|hs|nim|ocaml|haxe|hx" \
-    ")#run( *#\\w*( *= *[\\w.]*)?)*$")
+    ")\\s*#run( *#\\w*( *= *[\\w.]*)?)*$")
 block_end     = re.compile("^```$")
 
 block_unboxed      = re.compile(".*#unboxed")
